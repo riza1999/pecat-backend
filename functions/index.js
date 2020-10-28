@@ -3,22 +3,43 @@ const admin = require('firebase-admin');
 admin.initializeApp();
 const db = admin.firestore();
 
-// Create and Deploy Your First Cloud Functions
-// https://firebase.google.com/docs/functions/write-firebase-functions
+const express = require('express');
+const api = express();
 
-exports.helloWorld = functions.https.onRequest(async(request, response) => {
-  functions.logger.info("Hello logs!", {structuredData: true});
-  response.send("Hello from Palangka!");
+const cors = require('cors')({origin: true});
+api.use(cors);
+
+api.get('/cat', (req, res) => {
+   res.send('CAT');
 });
 
-exports.getData = functions.https.onRequest((req, res) => {
-    db.collection("Employee").get().then(function(querySnapshot){
-        querySnapshot.forEach(doc => {
-           console.log(doc.data());
-           return res.send(doc.data());
-        });
-      }).catch(err => {
-         console.log('Error getting documents', err);
+api.get('/getDataEmployee', (req,res) => {
+   db.collection("Employee").get().then(function(querySnapshot){
+      querySnapshot.forEach(doc => {
+         let hasil = doc.data();
+         let {name,email} = hasil;
+
+         if(hasil.job_id) {
+            hasil.job_id.get().then(resp => {
+               hasil.blabla = resp.data();
+               let job_name = hasil.blabla.name;
+
+               return res.json({
+                  name: name,
+                  email: email,
+                  job_name: job_name
+               });
+            })
+         }else{
+            return res.json({
+               name: name,
+               email: email
+            });
+         }
       });
-});
+    }).catch(err => {
+       console.log('Error getting documents', err);
+    });
+})
 
+exports.api = functions.https.onRequest(api);
