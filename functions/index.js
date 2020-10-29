@@ -78,6 +78,7 @@ api.post('/getSchedule', async (req,res) => {
    
    if(snapshot.empty){
       res.json({
+         status: 'No Schedule',
          schedule: {}
       })
    }
