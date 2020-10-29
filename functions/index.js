@@ -64,5 +64,45 @@ api.post('/login', async (req,res) => {
    })
 })
 
+api.post('/getSchedule', async (req,res) => {
+   let {uid} = req.body;
+   let kirim = [];
+
+   employeeRef = db.collection('Employee').doc(uid);
+
+   const snapshot = await db.collection("Schedule")
+                              .where('employee_id','==', employeeRef)
+                              .get();
+
+
+   
+   if(snapshot.empty){
+      res.json({
+         schedule: {}
+      })
+   }
+
+   let lengthSchedule = snapshot.size;
+   var ctr = 0;
+   snapshot.forEach(doc =>{
+      let hasil = doc.data();
+      let start_date = hasil.start_date._seconds;
+      let end_date = hasil.end_date._seconds;
+
+      if(hasil.site_id){
+         hasil.site_id.get().then(resp =>{
+            ctr++;
+            hasil.blabla = resp.data();
+            let site_name = hasil.blabla.name;
+            kirim.push({
+               start_date: start_date,
+               end_date: end_date,
+               site_name: site_name
+            })
+            if(ctr===lengthSchedule) res.json({response: kirim});
+         })
+      }
+   })
+})
 
 exports.api = functions.https.onRequest(api);
