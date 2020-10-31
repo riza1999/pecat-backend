@@ -24,7 +24,7 @@ api.post('/login', async (req,res) => {
       //jika password dan email salah
       res.json({
          success: false,
-         info: 'Invalid email or password',
+         info: 'Email atau password salah',
          employee: {}
       });
    }
@@ -78,7 +78,7 @@ api.post('/getSchedule', async (req,res) => {
    
    if(snapshot.empty){
       res.json({
-         status: 'No Schedule',
+         status: 'Tidak Memiliki Jadwal',
          schedule: {}
       })
    }
